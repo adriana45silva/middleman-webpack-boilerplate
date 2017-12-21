@@ -7,16 +7,17 @@ const {resolve} = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+let bar;
 const appEntries = 
   [
     {
       pagename: 'index',
-      pathJS: ['build/javascripts/index.js'],
-      pathHtml: 'build/index.html'
+      pathJS: ['source/javascripts/index.js'],
+      pathHtml: './build/index.html'
     },
     { pagename: 'foo',
-      pathJS: ['build/javascripts/foo/foo.js'],
-      pathHtml: 'build/pages/foo.html'
+      pathJS: ['source/javascripts/foo/foo.js'],
+      pathHtml: './build/pages/foo.html'
     }
   ]
 
@@ -26,6 +27,7 @@ const appEntries =
 
 
 const generateHtmls = (htmlName, htmlPath) => {
+  console.log('aaaaaa')
   return new HtmlWebpackPlugin({  
     filename: `${htmlName}.html`,
     template: htmlPath
@@ -53,7 +55,7 @@ let pluginsProd = () => {
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'common'
-    })      
+    }), bar
   ];
 };
 
@@ -134,22 +136,29 @@ const entries = () => {
   var a = Object.assign([], appEntries);
   a.forEach((index, value) => {
     // index.pathJs.unshift(...common);
-    let resolvePaths = [...common, resolve(__dirname, index.pathHtml)];
-    // [...pluginsProd()].push( generateHtmls(index.pagename,  resolvePaths ));
+    // let resolvePaths = ;
+    let arrPaths = [];
+    arrPaths.push(...common, resolve(__dirname, index.pathJS[0]));
+    bar = generateHtmls(index.pagename,  resolve(__dirname, index.pathHtml) );
 
 
     // console.log(b[index.pagename] = index.pathJs)
 
-    b[index.pagename] = resolvePaths;
+    console.log(resolve(__dirname, index.pathHtml))
+
+    b[index.pagename] = arrPaths;
+    
   });
+
   
-  console.log(b)
- return {
-    boo: entries,
-    foo: foo
- }
   
-  // return b;
+  
+//  return {
+//     boo: entries,
+//     foo: foo
+//  }
+  
+  return b;
 }
 
 // ------------------------------------------------------------------
@@ -237,6 +246,6 @@ let config = {
   }
 };
 
-// console.log(entries())
+console.log(pluginsProd())
 
 module.exports = config;
