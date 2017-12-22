@@ -7,7 +7,7 @@ const {resolve} = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-let bar;
+var bar;
 const appEntries = 
   [
     {
@@ -27,11 +27,14 @@ const appEntries =
 
 
 const generateHtmls = (htmlName, htmlPath) => {
-  console.log('aaaaaa')
-  return new HtmlWebpackPlugin({  
+  let generateInstances = [];
+
+  generateInstances.push(new HtmlWebpackPlugin({  
     filename: `${htmlName}.html`,
-    template: htmlPath
-  })
+    template: htmlPath,
+    chunks: [htmlName]
+  }))
+  bar = generateInstances
 }
 
 const pluginsDev = () => {
@@ -45,6 +48,7 @@ const pluginsDev = () => {
 }
 
 let pluginsProd = () => {
+  console.log(bar[0].options.chunks)
   return [
     new UglifyJsPlugin({
       test: /\.js($|\?)/i
@@ -55,7 +59,7 @@ let pluginsProd = () => {
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'common'
-    }), bar
+    }), ...bar
   ];
 };
 
@@ -124,10 +128,11 @@ const entries = () => {
   let common = ['babel-polyfill', 'whatwg-fetch'];
   var b = {};
   let entries = [];
-  let foo = [];
+  // let foo = [];
+  bar = [];
 
-  entries.push(...common, resolve(__dirname, 'source/javascripts/index.js'));
-  foo.push(...common, resolve(__dirname, 'source/javascripts/foo/foo.js'));
+  // entries.push(...common, resolve(__dirname, 'source/javascripts/index.js'));
+  // foo.push(...common, resolve(__dirname, 'source/javascripts/foo/foo.js'));
 
   // console.log(foo)
   // console.log(entries)
@@ -135,16 +140,19 @@ const entries = () => {
 
   var a = Object.assign([], appEntries);
   a.forEach((index, value) => {
-    // index.pathJs.unshift(...common);
-    // let resolvePaths = ;
     let arrPaths = [];
     arrPaths.push(...common, resolve(__dirname, index.pathJS[0]));
-    bar = generateHtmls(index.pagename,  resolve(__dirname, index.pathHtml) );
+    // generateHtmls(index.pagename,  resolve(__dirname, index.pathHtml) );
 
+    bar.push(new HtmlWebpackPlugin({  
+      filename: `${index.pagename}.html`,
+      template: resolve(__dirname, index.pathHtml),
+      chunks: ['common', index.pagename]
+    }))
 
-    // console.log(b[index.pagename] = index.pathJs)
+    // console.log(...bar)
 
-    console.log(resolve(__dirname, index.pathHtml))
+    // console.log(...bar)
 
     b[index.pagename] = arrPaths;
     
@@ -246,6 +254,6 @@ let config = {
   }
 };
 
-console.log(pluginsProd())
+// console.log( pluginsProd())
 
 module.exports = config;
