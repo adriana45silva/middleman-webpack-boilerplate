@@ -3,4 +3,4 @@ var a = [1,2,30];
 console.log(...a);
 
 
-import 'stylesheets/site';
+import '../stylesheets/site.css.scss';

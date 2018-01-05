@@ -1,52 +1,59 @@
 const webpack = require('webpack');
-const {resolve} = require('path');
+const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const DirectoryTreePlugin = require('directory-tree-webpack-plugin');
+var webpackInstances = [];
+const dirTreeJson = require('./dir-tree.json');
 
-var webpackInstances;
+// ------------------------------------------------------------------
+
+function traverseDirTree(json) {
+  var jsArr = [];
+  var htmlArr = [];
+
+  function traverseSubDirTree(arr) {
+    for (let i in arr) {
+      let currentEl = arr[i];
+      if (currentEl.type === 'file') {
+        if (currentEl.extension == '.js' && currentEl.path.includes('source')) {
+          jsArr.push(currentEl);
+        } else if (
+          currentEl.extension == '.html' &&
+          currentEl.path.includes('build')
+        ) {
+          htmlArr.push(currentEl);
+        }
+      } else if (currentEl.type == 'directory') {
+        traverseSubDirTree(currentEl.children);
+      }
+    }
+    return { jsArr, htmlArr };
+  }
+
+  return traverseSubDirTree(json.children);
+}
 
 // ------------------------------------------------------------------
 
 exports = webpackInstances;
 
-exports = appEntries = 
-  [
-    {
-      pagename: 'index',
-      pathJS: ['source/javascripts/index.js'],
-      pathHtml: './build/index.html'
-    },
-    { pagename: 'foo',
-      pathJS: ['source/javascripts/foo/foo.js'],
-      pathHtml: './build/pages/foo.html'
-    }
-  ]
-
 // ------------------------------------------------------------------
 
 exports = entries = () => {
   let common = ['babel-polyfill', 'whatwg-fetch'];
-  let entriesArr = {};
-  webpackInstances = [];
+  var newArr = [];
+  var obj = {};
 
-  let mergedArr = Object.assign([], appEntries);
-  mergedArr.forEach((index, value) => {
-    let arrPaths = [];
-    arrPaths.push(...common, resolve(__dirname, index.pathJS[0]));
+  let jsArr = traverseDirTree(dirTreeJson).jsArr;
 
-    webpackInstances.push(new HtmlWebpackPlugin({  
-      filename: `${index.pagename}.html`,
-      template: resolve(__dirname, index.pathHtml),
-      chunks: ['common', index.pagename]
-    }))
-
-    entriesArr[index.pagename] = arrPaths;
-    
+  jsArr.forEach(el => {
+    obj[el.name.substr(0, el.name.length - 3)] = [...common, el.path];
   });
-  
-  return entriesArr;
-}
+
+  return obj;
+};
 
 // ------------------------------------------------------------------
 
@@ -76,7 +83,7 @@ exports = styleLoaderDev = () => {
   ];
 
   return styleLoaderDev;
-}
+};
 
 // ------------------------------------------------------------------
 
@@ -95,26 +102,33 @@ exports = styleLoaderProd = () => {
         }
       },
       { loader: 'postcss-loader' }
-    ]})
+    ]
+  });
   return styleLoaderProd;
-}
+};
 
 // ------------------------------------------------------------------
-
 
 exports = pluginsDev = () => {
   return [
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV)
       }
-    }) 
-  ]
-}
+    }),
+    new DirectoryTreePlugin({
+      dir: resolve(__dirname),
+      path: resolve(__dirname, 'dir-tree.json'),
+      extensions: /\.html|js$/,
+      exclude: /node_modules/
+    })
+  ];
+};
 
 // ------------------------------------------------------------------
 
 exports = pluginsProd = () => {
+  console.log(webpackInstances);
   return [
     new UglifyJsPlugin({
       test: /\.js($|\?)/i
@@ -125,23 +139,37 @@ exports = pluginsProd = () => {
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'common'
-    }), 
-    ...webpackInstances
+    }),
+    ...generateHtmls()
   ];
 };
 
 // ------------------------------------------------------------------
 
-
 exports = generateHtmls = (htmlName, htmlPath) => {
   let generateInstances = [];
+  let htmlArr = traverseDirTree(dirTreeJson).htmlArr;
 
-  generateInstances.push(new HtmlWebpackPlugin({  
-    filename: `${htmlName}.html`,
-    template: htmlPath,
-    chunks: [htmlName]
-  }))
-  webpackInstances = generateInstances
-}
+  htmlArr.forEach(el => {
+    let name = el.name.substr(0, el.name.length - 5);
+    generateInstances.push(
+      new HtmlWebpackPlugin({
+        filename: `${el.name}.html`,
+        template: el.path,
+        chunks: [name]
+      })
+    );
+  });
 
-return (module.exports = {webpackInstances, entries, styleLoaderDev, styleLoaderProd, pluginsDev, pluginsProd, generateHtmls, appEntries});
+  return generateInstances;
+};
+
+return (module.exports = {
+  webpackInstances,
+  entries,
+  styleLoaderDev,
+  styleLoaderProd,
+  pluginsDev,
+  pluginsProd,
+  generateHtmls
+});

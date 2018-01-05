@@ -48,7 +48,7 @@ page '/*.txt', layout: false
 
 class WebpackBuild < Middleman::Extension
   def after_build(builder)
-    builder.thor.run './build.sh'
+    builder.thor.run 'npm run build-sh'
   end
 end  
 
@@ -58,11 +58,20 @@ configure :build do
   activate :webpack_build
 end
 
+# configure :build do
+#   activate :external_pipeline,
+#   name: :webpack,
+#   command: "middleman build",
+#   source: ".webpack_build"  
+# end
+
 activate :livereload
 
 
-# activate :external_pipeline,
-#   name: :webpack,
-#   command: build? ? "middleman build" : "npm run dev" ,
-#   source: "./tmp/build",
-#   latency: 1
+  configure :development do
+    activate :external_pipeline,
+    name: :webpack,
+    command: "npm run dev" ,
+    source: "./tmp/build",
+    latency: 1    
+  end

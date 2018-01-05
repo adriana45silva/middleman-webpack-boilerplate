@@ -5,18 +5,22 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development webpack-dev-server --config=webpack.config.js",
-    "build": "NODE_ENV=production webpack --progress --color"
+    "build": "NODE_ENV=production webpack --progress --color",
+    "build-sh": "./build.sh"
   },
   "author": "Adriana Silva",
   "license": "ISC",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "css-loader": "^0.28.7",
+    "directory-tree-webpack-plugin": "^0.2.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "html-loader": "^0.5.1",
     "html-webpack-plugin": "^2.30.1",
@@ -33,5 +37,8 @@
     "webpack-dev-server": "^2.9.7",
     "webpack-middleman": "^0.1.2",
     "whatwg-fetch": "^2.0.3"
+  },
+  "dependencies": {
+    "react-hot-loader": "^3.1.3"
   }
 }

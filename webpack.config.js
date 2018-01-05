@@ -3,38 +3,44 @@
 // ------------------------------------------------------------------
 
 const webpack = require('webpack');
-const {resolve} = require('path');
+const { resolve } = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-let {pluginsProd, webpackInstances} = require( resolve(__dirname, './webpack.func.js') );
+let { pluginsProd, webpackInstances } = require(resolve(
+  __dirname,
+  './webpack.func.js'
+));
 
 const {
-  entries, 
-  styleLoaderDev, 
-  styleLoaderProd, 
+  entries,
+  styleLoaderDev,
+  styleLoaderProd,
   pluginsDev,
-  generateHtmls
-} = require( resolve(__dirname, './webpack.func.js') )
-
+  generateHtmls,
+  foo
+} = require(resolve(__dirname, './webpack.func.js'));
 
 // ------------------------------------------------------------------
 // Plugins & Other configs
 // ------------------------------------------------------------------
 
-
 const plugins = () => {
   let arr = [];
-  process.env.NODE_ENV == 'development' ? arr.push(...pluginsDev()) : arr.push(...pluginsProd());
+  process.env.NODE_ENV == 'development'
+    ? arr.push(...pluginsDev())
+    : arr.push(...pluginsProd());
 
   return arr;
-}
+};
 
 // ------------------------------------------------------------------
 
 const sassLoader = () => {
-  return process.env.NODE_ENV == 'production' ? styleLoaderProd() : styleLoaderDev();
+  return process.env.NODE_ENV == 'production'
+    ? styleLoaderProd()
+    : styleLoaderDev();
 };
 
 // ------------------------------------------------------------------
@@ -50,9 +56,7 @@ let config = {
   },
   context: resolve(__dirname, 'source'),
   devtool:
-    process.env.NODE_ENV == 'production'
-      ? 'source-map'
-      : 'cheap-module-map',
+    process.env.NODE_ENV == 'production' ? 'source-map' : 'cheap-module-map',
   stats: 'errors-only',
   devServer: {
     hot: true,
@@ -68,11 +72,11 @@ let config = {
     rules: [
       {
         test: /\.jsx?$/,
-        use: [ 'babel-loader' ],
+        use: ['babel-loader'],
         exclude: /node_modules|\.tmp|vendor/
       },
       {
-        test: /\.scss$/,
+        test: /\.css.scss$/,
         use: sassLoader()
       },
       {
@@ -96,17 +100,11 @@ let config = {
         use: {
           loader: 'html-loader'
         }
-      }                 
+      }
     ]
   },
   resolve: {
-    extensions: [
-      '.js',
-      '.json',
-      '.scss',
-      '.css',
-      '.svg',
-    ],
+    extensions: ['.js', '.json', '.scss', '.css', '.svg'],
     alias: {
       stylesheets: resolve(__dirname, 'source/stylesheets'),
       javascripts: resolve(__dirname, 'source/javascripts'),
