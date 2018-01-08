@@ -20,6 +20,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "css-loader": "^0.28.7",
+    "directory-tree": "^2.0.0",
     "directory-tree-webpack-plugin": "^0.2.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "html-loader": "^0.5.1",

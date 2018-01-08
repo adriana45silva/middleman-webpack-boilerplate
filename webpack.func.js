@@ -3,9 +3,12 @@ const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const DirectoryTreePlugin = require('directory-tree-webpack-plugin');
-var webpackInstances = [];
-const dirTreeJson = require('./dir-tree.json');
+
+const dirTree = require('directory-tree');
+const dirTreeJson = dirTree(resolve(__dirname), {
+  exclude: /node_modules/,
+  extensions: /\.html|js/
+});
 
 // ------------------------------------------------------------------
 
@@ -34,10 +37,6 @@ function traverseDirTree(json) {
 
   return traverseSubDirTree(json.children);
 }
-
-// ------------------------------------------------------------------
-
-exports = webpackInstances;
 
 // ------------------------------------------------------------------
 
@@ -115,12 +114,6 @@ exports = pluginsDev = () => {
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV)
       }
-    }),
-    new DirectoryTreePlugin({
-      dir: resolve(__dirname),
-      path: resolve(__dirname, 'dir-tree.json'),
-      extensions: /\.html|js$/,
-      exclude: /node_modules/
     })
   ];
 };
@@ -128,7 +121,6 @@ exports = pluginsDev = () => {
 // ------------------------------------------------------------------
 
 exports = pluginsProd = () => {
-  console.log(webpackInstances);
   return [
     new UglifyJsPlugin({
       test: /\.js($|\?)/i
@@ -165,7 +157,6 @@ exports = generateHtmls = (htmlName, htmlPath) => {
 };
 
 return (module.exports = {
-  webpackInstances,
   entries,
   styleLoaderDev,
   styleLoaderProd,
