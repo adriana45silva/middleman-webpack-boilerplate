@@ -146,11 +146,13 @@ exports = generateHtmls = (htmlName, htmlPath) => {
     let name = el.name.substr(0, el.name.length - 5);
     generateInstances.push(
       new HtmlWebpackPlugin({
-        filename: `${el.name}.html`,
+        filename: `${el.name}`,
         template: el.path,
-        chunks: [name]
+        chunks: [name, 'common']
       })
     );
+
+    
   });
 
   return generateInstances;
