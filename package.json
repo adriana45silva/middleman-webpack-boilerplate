@@ -24,7 +24,7 @@
     "directory-tree-webpack-plugin": "^0.2.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "html-loader": "^0.5.1",
-    "html-webpack-plugin": "^2.30.1",
+    "html-webpack-plugin": "^5.5.0",
     "node-sass": "^4.7.2",
     "normalize.css": "^7.0.0",
     "postcss-loader": "^2.0.9",
